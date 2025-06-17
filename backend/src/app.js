@@ -15,8 +15,13 @@ app.get("/", (req, res) => {
 
 import userRouter from '../src/routes/user.route.js'
 import healthCheck from '../src/routes/healthCheck.route.js'
+import memeRoute from '../src/routes/meme.route.js'
+
+
+
 app.use('/api/v1/user', userRouter );
 app.use('/api/v1/health-check', healthCheck)
+app.use('/api/v1/meme', memeRoute)
 
 
 

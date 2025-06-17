@@ -27,7 +27,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       throw new ApiError(401, "Invalid access token - user not found");
     }
 
-    // Add user to request object
     req.user = user;
     next();
     
