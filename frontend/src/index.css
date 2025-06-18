@@ -1,3 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body, html {
+  @apply bg-black text-cyan-400 font-mono min-h-screen;
+  background: #18181b;
+  color: #0fffc1;
+  min-height: 100vh;
+  font-family: 'Fira Mono', 'monospace';
+}
+
+#root {
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* Form input styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+  @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+}
+
+/* Button styles */
+.btn {
+  @apply px-4 py-2 rounded-md font-medium transition-colors;
+}
+
+.btn-primary {
+  @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+.btn-danger {
+  @apply bg-red-500 text-white hover:bg-red-600;
+}
+
+/* Cyberpunk Neon Glow */
+.cyber-glow-cyan {
+  text-shadow: 0 0 8px #00fff7, 0 0 16px #00fff7, 0 0 32px #00fff7;
+}
+.cyber-glow-green {
+  text-shadow: 0 0 8px #00ff41, 0 0 16px #00ff41, 0 0 32px #00ff41;
+}
+.cyber-glow-pink {
+  text-shadow: 0 0 8px #ff00de, 0 0 16px #ff00de, 0 0 32px #ff00de;
+}
+.cyber-glow-purple {
+  text-shadow: 0 0 8px #8b5cf6, 0 0 16px #8b5cf6, 0 0 32px #8b5cf6;
+}
+
+/* Neon Borders */
+.cyber-border-cyan {
+  border: 2px solid #00fff7;
+  box-shadow: 0 0 12px #00fff780;
+}
+.cyber-border-green {
+  border: 2px solid #00ff41;
+  box-shadow: 0 0 12px #00ff4180;
+}
+.cyber-border-pink {
+  border: 2px solid #ff00de;
+  box-shadow: 0 0 12px #ff00de80;
+}
+.cyber-border-purple {
+  border: 2px solid #8b5cf6;
+  box-shadow: 0 0 12px #8b5cf680;
+}
+
+/* Neon Button */
+.cyber-btn {
+  @apply font-bold uppercase tracking-widest px-6 py-3 rounded-lg transition-all duration-300;
+  background: linear-gradient(90deg, #00fff7 0%, #8b5cf6 100%);
+  color: #0f0f0f;
+  box-shadow: 0 0 16px #00fff7, 0 0 32px #8b5cf6;
+  border: none;
+}
+.cyber-btn:hover, .cyber-btn:focus {
+  background: linear-gradient(90deg, #ff00de 0%, #00ff41 100%);
+  color: #fff;
+  box-shadow: 0 0 32px #ff00de, 0 0 64px #00ff41;
+}
+
+/* Neon Input */
+.cyber-input {
+  @apply bg-black text-cyan-400 border-cyan-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500;
+  box-shadow: 0 0 8px #00fff7;
+}
+
+/* Animated Background */
+.cyberpunk-bg {
+  background: linear-gradient(135deg, #0f0f0f 60%, #1a0033 100%);
+  position: relative;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #1a0033;
+}
+::-webkit-scrollbar-thumb {
+  background: #00fff7;
+  border-radius: 8px;
+}
+
+/* Utility for uppercase neon headings */
+.cyber-heading {
+  @apply uppercase tracking-widest font-bold text-3xl mb-4 cyber-glow-cyan;
+}
+
+/* Utility for neon cards */
+.cyber-card {
+  @apply bg-black/80 p-6 rounded-xl shadow-lg cyber-border-cyan;
+}
+
+/* Utility for animated pulse */
+.cyber-pulse {
+  animation: cyberPulse 1.5s infinite alternate;
+}
+@keyframes cyberPulse {
+  0% { box-shadow: 0 0 16px #00fff7, 0 0 32px #8b5cf6; }
+  100% { box-shadow: 0 0 32px #ff00de, 0 0 64px #00ff41; }
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -20,14 +147,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
