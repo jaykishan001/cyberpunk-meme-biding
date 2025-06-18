@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/upload', verifyJWT, upload.single('image'), uploadMeme);
 router.get('/all', getMemes);
 router.post('/:memeId/vote', verifyJWT, voteOnMeme);
-router.post('/memes', verifyJWT, getUserMemes);
+router.get('/user-memes', verifyJWT, getUserMemes);
 
 
 

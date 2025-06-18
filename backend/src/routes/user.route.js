@@ -10,5 +10,8 @@ router.post('/logout',verifyJWT, logout);
 router.get('/profile',verifyJWT, getProfile);
 router.put('/profile',verifyJWT, updateProfile);
 router.put('/change-password', verifyJWT, changePassword);
+router.get('/verify', verifyJWT, (req, res) => {
+  res.status(200).json({ success: true, user: req.user });
+});
 
 export default router;
