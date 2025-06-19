@@ -27,9 +27,6 @@ function App() {
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [leaderboardError, setLeaderboardError] = useState('');
 
-
-
-
   const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   console.log('BASE_URL', BASE_URL);
   // Separate socket initialization function - removed socket dependency
@@ -82,7 +79,7 @@ function App() {
       
       if (token) {
         try {
-          const response = await fetch('http://localhost:4000/api/v1/user/verify', {
+          const response = await fetch(`${BASE_URL}/api/v1/user/verify`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
