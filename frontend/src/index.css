@@ -5,11 +5,20 @@
 /* Custom styles */
 body, html {
   @apply bg-black text-cyan-400 font-mono min-h-screen;
+  background: url('/bgimage.jpg') no-repeat center center fixed, #0f172a;
+  background-size: cover;
+  min-height: 100vh;
+  font-family: 'Fira Mono', 'monospace';
+}
+
+/* body, html {
+  @apply bg-black text-cyan-400 font-mono min-h-screen;
   background: #18181b;
   color: #0fffc1;
   min-height: 100vh;
   font-family: 'Fira Mono', 'monospace';
-}
+} */
+
 
 #root {
   min-height: 100vh;
@@ -184,4 +193,15 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* If you want to add a dark overlay, you can use a ::before pseudo-element in App.css or a layout component. */
+
+/* Move this to the end of the file to ensure it overrides other backgrounds */
+body {
+  background: url('/bgimage.jpg') no-repeat center center fixed, #0f172a;
+  background-size: cover;
+  min-height: 100vh;
+  font-family: 'Fira Mono', 'monospace';
+  color: #0fffc1;
 }

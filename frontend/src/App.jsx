@@ -213,9 +213,28 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div
+      className="min-h-screen relative"
+      style={{
+        background: "url('/bgimage.jpg') no-repeat center center fixed, #0f172a",
+        backgroundSize: "cover",
+        minHeight: "100vh"
+      }}
+    >
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(10, 10, 42, 0.7)', // dark blue/black with 70% opacity
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
       <Navbar user={user} onLogout={handleLogout} />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8" style={{ position: 'relative', zIndex: 1 }}>
         <Routes>
           <Route
             path="/"
