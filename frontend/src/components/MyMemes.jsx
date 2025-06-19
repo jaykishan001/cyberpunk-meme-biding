@@ -51,7 +51,7 @@ function MyMemes({ user }) {
               <img
                 src={meme.image_url}
                 alt={meme.title}
-                className="w-full h-64 object-cover rounded-lg mb-4 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg"
+                className="w-full h-64 object-contain rounded-lg mb-4 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg"
                 loading="lazy"
                 onError={e => {
                   e.target.style.display = 'none';

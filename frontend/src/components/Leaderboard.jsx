@@ -39,7 +39,7 @@ function Leaderboard({ leaderboard, loading, error, fetchLeaderboard }) {
                   <img
                     src={meme.image_url}
                     alt={meme.title}
-                    className="w-full h-64 object-cover rounded-lg mb-4"
+                    className="w-full h-64 object-contain rounded-lg mb-4"
                     loading="lazy"
                     onError={e => {
                       e.target.style.display = 'none';

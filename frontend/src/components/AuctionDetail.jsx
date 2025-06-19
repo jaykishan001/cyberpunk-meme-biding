@@ -236,14 +236,14 @@ function AuctionDetail({ socket, user }) {
         <h2 className="cyber-heading text-center mb-6">AUCTION RESULT</h2>
         <div className="flex flex-col items-center gap-6">
           <img
-            src={auction?.memes?.image_url}
-            alt={auction?.memes?.title}
+            src={auction?.auction?.memes?.image_url}
+            alt={auction?.auction?.memes?.title}
             className="w-full h-72 object-cover rounded-lg mb-4 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg"
           />
           <h3 className="text-lg font-bold mb-2 text-cyan-400 cyber-glow-cyan uppercase tracking-widest text-center">
-            {auction?.meme?.title}
+            {auction?.auction?.memes?.title}
           </h3>
-          
+          {console.log("auction from auction detail", auction)}
           <div className="text-purple-400 text-xs mb-2 font-mono">
             Seller: {auction?.auction?.seller?.username || 'Unknown'}
           </div>
@@ -275,18 +275,18 @@ function AuctionDetail({ socket, user }) {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1 flex flex-col items-center">
           <img
-            src={auction?.meme?.image_url}
-            alt={auction?.meme?.title}
-            className="w-full h-72 object-cover rounded-lg mb-4 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg"
+            src={auction?.auction?.memes?.image_url}
+            alt={auction?.auction?.memes?.title}
+            className="w-full h-auto object-contain rounded-lg mb-4 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg"
           />
           <h3 className="text-lg font-bold mb-2 text-cyan-400 cyber-glow-cyan uppercase tracking-widest text-center">
-            {auction?.meme?.title}
+            {auction?.auction?.memes?.title}
           </h3>
           <div className="text-purple-400 text-xs mb-2 font-mono">
-            Seller: {auction?.seller?.username || 'Unknown'}
+            Seller: {auction?.auction?.seller?.username || 'Unknown'}
           </div>
           <div className="flex justify-between w-full mb-2">
-            <div className="text-green-400 font-bold">${auction?.current_highest_bid}</div>
+            <div className="text-green-400 font-bold">${auction?.auction?.current_highest_bid}</div>
             <div className="text-cyan-300">{isAuctionEnded ? 'Auction Ended' : timeLeft}</div>
           </div>
           <div className="text-cyan-400 text-xs mb-2">Time left: {timeLeft}</div>
