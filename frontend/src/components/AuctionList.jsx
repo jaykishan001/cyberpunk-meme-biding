@@ -131,7 +131,9 @@ function AuctionList({ socket, user }) {
   }, []);
 
   const handleNewAuction = useCallback((newAuction) => {
-    setAuctions(prevAuctions => [newAuction, ...prevAuctions]);
+    // Unwrap if the auction is nested in { auction: ... }
+    const auctionObj = newAuction && newAuction.auction ? newAuction.auction : newAuction;
+    setAuctions(prevAuctions => [auctionObj, ...prevAuctions]);
   }, []);
 
   const handleAuctionEnded = useCallback((auctionData) => {

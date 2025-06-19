@@ -69,10 +69,32 @@ export const createAuction = asyncHandler(async (req, res) => {
 
   // Notify all users about new auction
   const io = getIo();
-  io.emit('new_auction', {
-    auction,
-    message: `New auction started for "${meme.title}"`
-  });
+
+  // Fetch the full auction with all joins
+  const { data: fullAuction, error: fetchError } = await supabase
+    .from('auctions')
+    .select(`
+      *,
+      memes(*),
+      seller:users!seller_id(username, avatar_url),
+      highest_bidder:users!highest_bidder_id(username, avatar_url),
+      bids(count)
+    `)
+    .eq('id', auction.id)
+    .single();
+
+  if (fetchError) {
+    // fallback to the original auction if fetch fails
+    io.emit('new_auction', {
+      auction,
+      message: `New auction started for "${meme.title}"`
+    });
+  } else {
+    io.emit('new_auction', {
+      auction: fullAuction,
+      message: `New auction started for "${meme.title}"`
+    });
+  }
 
   res.status(201).json(new ApiResponse(201, { auction }, 'Auction created successfully'));
 });

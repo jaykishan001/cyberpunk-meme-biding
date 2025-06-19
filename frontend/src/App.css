@@ -40,3 +40,59 @@
 .read-the-docs {
   color: #888;
 }
+
+
+
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: #111;
+  color: white;
+}
+
+.navbar-left a,
+.navbar-right a,
+.dropdown-item {
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 45px;
+  background: #222;
+  border: 1px solid #333;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 100;
+}
+
+.dropdown-item {
+  display: block;
+  margin: 5px 0;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  text-decoration: underline;
+}

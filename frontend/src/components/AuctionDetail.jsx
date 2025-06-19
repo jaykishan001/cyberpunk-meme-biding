@@ -18,8 +18,9 @@ function AuctionDetail({ socket, user }) {
   // Calculate auction status
   const isAuctionEnded = auction?.status === 'ended';
   const isSeller = user && auction?.seller_id === user.id;
+  const isCurrentOwner = user && auction?.memes?.current_owner_id === user.id;
   const isHighestBidder = user && auction?.highest_bidder_id === user.id;
-  const canBid = !isAuctionEnded && user && !isSeller;
+  const canBid = !isAuctionEnded && user && !isSeller && !isCurrentOwner;
 
   useEffect(() => {
     fetchAuctionDetails();
@@ -36,10 +37,13 @@ function AuctionDetail({ socket, user }) {
     };
   }, [auctionId, socket]);
 
+
+  console.log("auction timeeeing", auction)
+
   useEffect(() => {
     if (auction && !isAuctionEnded) {
       const timer = setInterval(() => {
-        const endTime = new Date(auction.auction_end_time);
+        const endTime = new Date(auction.auction.auction_end_time);
         const now = new Date();
         const difference = endTime - now;
 
@@ -235,15 +239,16 @@ function AuctionDetail({ socket, user }) {
         <h2 className="cyber-heading text-center mb-6">AUCTION RESULT</h2>
         <div className="flex flex-col items-center gap-6">
           <img
-            src={auction?.meme?.image_url}
-            alt={auction?.meme?.title}
+            src={auction?.memes?.image_url}
+            alt={auction?.memes?.title}
             className="w-full h-72 object-cover rounded-lg mb-4 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg"
           />
           <h3 className="text-lg font-bold mb-2 text-cyan-400 cyber-glow-cyan uppercase tracking-widest text-center">
             {auction?.meme?.title}
           </h3>
+          
           <div className="text-purple-400 text-xs mb-2 font-mono">
-            Seller: {auction?.seller?.username || 'Unknown'}
+            Seller: {auction?.auction?.seller?.username || 'Unknown'}
           </div>
           {winner ? (
             <div className="bg-black/80 border border-green-400 rounded-lg p-4 mb-2 cyber-glow-cyan text-center">
@@ -325,7 +330,7 @@ function AuctionDetail({ socket, user }) {
               </button>
             </form>
           )}
-          {isSeller && !isAuctionEnded && (
+          {(isSeller || isCurrentOwner) && !isAuctionEnded && (
             <button
               onClick={handleEndAuction}
               className="cyber-btn bg-pink-600 hover:bg-green-500 text-white mt-4"

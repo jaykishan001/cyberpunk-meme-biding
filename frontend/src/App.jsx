@@ -10,6 +10,10 @@ import AuctionDetail from './components/AuctionDetail';
 import CreateAuction from './components/CreateAuction';
 import MyAuctions from './components/MyAuctions';
 import MyBids from './components/MyBids';
+import Signup from './components/Signup';
+import Leaderboard from './components/Leaderboard';
+import Competition from './components/Competition';
+import MyMemes from './components/MyMemes';
 
 function App() {
   const navigate = useNavigate();
@@ -19,52 +23,11 @@ function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [userMemes, setUserMemes] = useState([]);
 
-  // Check for existing token and user on app load
-  useEffect(() => {
-    const initializeApp = async () => {
-      const token = localStorage.getItem('token');
-      
-      if (token) {
-        try {
-          // Verify token and get user data
-          const response = await fetch('http://localhost:4000/api/v1/user/verify', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData.user);
-            
-            // Initialize socket connection with valid token
-            initializeSocket(token);
-          } else {
-            // Token is invalid, clean up
-            localStorage.removeItem('token');
-          }
-        } catch (error) {
-          console.error('Token verification failed:', error);
-          localStorage.removeItem('token');
-        }
-      }
-      
-      setIsInitialized(true);
-    };
-
-    initializeApp();
-  }, []);
-
-  // Separate socket initialization function
+  // Separate socket initialization function - removed socket dependency
   const initializeSocket = useCallback((token) => {
-    // Disconnect existing socket if any
-    if (socket) {
-      socket.disconnect();
-    }
-
     const newSocket = io('http://localhost:4000', {
       auth: { token },
-      forceNew: true // Ensure fresh connection
+      forceNew: true
     });
 
     newSocket.on('connect', () => {
@@ -90,59 +53,91 @@ function App() {
       );
     });
 
-    setSocket(newSocket);
+    // Listen for wallet_update events
+    newSocket.on('wallet_update', (data) => {
+      setUser(prevUser => 
+        prevUser 
+          ? { ...prevUser, wallet_balance: data.wallet_balance } 
+          : prevUser
+      );
+    });
 
-    // Return cleanup function
-    return () => {
-      newSocket.disconnect();
+    return newSocket;
+  }, []); // No dependencies
+
+  // Check for existing token and user on app load
+  useEffect(() => {
+    const initializeApp = async () => {
+      // Safe localStorage access
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      
+      if (token) {
+        try {
+          const response = await fetch('http://localhost:4000/api/v1/user/verify', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData.user);
+            
+            // Initialize socket connection
+            const newSocket = initializeSocket(token);
+            setSocket(newSocket);
+          } else {
+            // Token is invalid, clean up
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('token');
+            }
+          }
+        } catch (error) {
+          console.error('Token verification failed:', error);
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+          }
+        }
+      }
+      
+      setIsInitialized(true);
     };
-  }, [socket]);
+
+    initializeApp();
+  }, [initializeSocket]);
 
   // Optimized login handler
   const handleLogin = useCallback((userData, token) => {
     setUser(userData);
-    localStorage.setItem('token', token);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', token);
+    }
     
-    // Initialize socket connection after successful login
-    initializeSocket(token);
-  }, [initializeSocket]);
+    // Disconnect existing socket
+    if (socket) {
+      socket.disconnect();
+    }
+    
+    // Initialize new socket connection
+    const newSocket = initializeSocket(token);
+    setSocket(newSocket);
+  }, [initializeSocket]); // Removed socket dependency
 
   // Optimized logout handler
   const handleLogout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem('token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
     
     if (socket) {
       socket.disconnect();
       setSocket(null);
     }
     
-    // Clear memes on logout
     setMemes([]);
-    
-    // Navigate to login
     navigate('/login');
   }, [socket, navigate]);
-
-  // Memoized ProtectedRoute component
-  const ProtectedRoute = useMemo(() => {
-    return ({ children }) => {
-      if (!isInitialized) {
-        // Show loading spinner while checking authentication
-        return (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
-          </div>
-        );
-      }
-      
-      if (!user) {
-        return <Navigate to="/login" replace />;
-      }
-      
-      return children;
-    };
-  }, [user, isInitialized]);
 
   // Cleanup socket on unmount
   useEffect(() => {
@@ -152,6 +147,23 @@ function App() {
       }
     };
   }, [socket]);
+
+  // Memoized ProtectedRoute component - moved outside render
+  const ProtectedRoute = useCallback(({ children }) => {
+    if (!isInitialized) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+        </div>
+      );
+    }
+    
+    if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+    
+    return children;
+  }, [user, isInitialized]);
 
   // Show loading screen while initializing
   if (!isInitialized) {
@@ -175,7 +187,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <div className="space-y-8">
-                  <UploadMeme socket={socket} user={user} />
                   <MemeFeed 
                     socket={socket} 
                     memes={memes} 
@@ -249,6 +260,40 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyBids user={user} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <Signup />
+              )
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <Leaderboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/competition"
+            element={
+              <ProtectedRoute>
+                <Competition socket={socket} user={user} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-memes"
+            element={
+              <ProtectedRoute>
+                <MyMemes user={user} />
               </ProtectedRoute>
             }
           />

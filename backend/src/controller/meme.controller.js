@@ -34,6 +34,12 @@ export const uploadMeme = asyncHandler(async (req, res) => {
 
     if (error) throw new ApiError(500, "Failed to insert meme", error);
 
+    // Emit real-time new meme event
+    const io = getIo();
+    if (io && meme && meme.length > 0) {
+      io.emit('new_meme', meme[0]);
+    }
+
     res.status(201).json(new ApiResponse(201, { meme }, "Meme uploaded successfully"));
   
 }
@@ -237,7 +243,7 @@ export const getUserMemes = asyncHandler(async (req, res) => {
         *,
         creator:users!creator_id(username, avatar_url)
       `)
-      .eq('creator_id', req.user.id)
+      .eq('current_owner_id', req.user.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -245,3 +251,22 @@ export const getUserMemes = asyncHandler(async (req, res) => {
     res.json(new ApiResponse(200, memes ,"retrived successfully" ));
  
 })
+
+export const getLeaderboardMemes = asyncHandler(async (req, res) => {
+  const { data: memes, error } = await supabase
+    .from('memes')
+    .select(`
+      *,
+      creator:users!creator_id(username, avatar_url),
+      current_owner:users!current_owner_id(username, avatar_url)
+    `)
+    .order('upvotes', { ascending: false })
+    .limit(10);
+
+  if (error) throw error;
+
+  res.status(200).json({
+    success: true,
+    memes
+  });
+});

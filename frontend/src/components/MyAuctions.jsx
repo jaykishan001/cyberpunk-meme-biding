@@ -71,11 +71,9 @@ function MyAuctions({ user }) {
             // Winner logic for ended auctions
             let winner = null;
             let winningBid = null;
-            if (auction.status === 'ended' && Array.isArray(auction.bids) && auction.bids.length > 0) {
-              // Highest bid is the first in sorted bids (desc)
-              const sortedBids = [...auction.bids].sort((a, b) => b.bid_amount - a.bid_amount);
-              winningBid = sortedBids[0];
-              winner = winningBid?.bidder;
+            if (auction.status === 'ended' && auction.highest_bidder && auction.current_highest_bid) {
+              winner = auction.highest_bidder;
+              winningBid = auction.current_highest_bid;
             }
             return (
               <div key={auction.id} className="cyber-card flex flex-col items-center">
@@ -92,17 +90,21 @@ function MyAuctions({ user }) {
                 </div>
                 <div className="flex justify-between w-full mb-2">
                   <div className="text-green-400 font-bold">${auction.current_highest_bid}</div>
-                  <div className="text-cyan-300">{auction.bids?.length || 0} bids</div>
+                  <div className="text-cyan-300">{Array.isArray(auction.bids) ? auction.bids.length : 0} bids</div>
                 </div>
                 <div className="text-purple-400 text-xs mb-2 font-mono">
                   Seller: {user?.username || 'You'}
                 </div>
+                {console.log('auction form my auctions', auction)}
                 {auction.status === 'ended' ? (
                   winner ? (
                     <div className="bg-black/80 border border-green-400 rounded-lg p-4 mb-2 cyber-glow-cyan text-center">
                       <h4 className="text-green-400 font-bold mb-2 uppercase tracking-widest">Winner</h4>
-                      <div className="text-lg text-green-300 font-mono">{winner.username}</div>
-                      <div className="text-cyan-300 font-mono">Winning Bid: ${winningBid.bid_amount}</div>
+                      <div className="flex flex-col items-center gap-2">
+                        <img src={winner.avatar_url} alt={winner.username} className="w-12 h-12 rounded-full border-2 border-green-400 mb-1" />
+                        <div className="text-lg text-green-300 font-mono">{winner.username}</div>
+                        <div className="text-cyan-300 font-mono">Winning Bid: ${winningBid}</div>
+                      </div>
                     </div>
                   ) : (
                     <div className="bg-black/80 border border-pink-400 rounded-lg p-4 mb-2 cyber-glow-pink text-center">

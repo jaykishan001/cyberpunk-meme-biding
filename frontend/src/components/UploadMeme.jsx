@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const GEMINI_API_KEY = 'AIzaSyAC53cbMIK9lp9vw7xmq8V2wFyvZ3CDLYw';
 
-function UploadMeme({ socket }) {
+function UploadMeme({ socket, onSuccess }) {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -85,6 +85,7 @@ function UploadMeme({ socket }) {
       setTitle('');
       setDescription('');
       setError('');
+      if (typeof onSuccess === 'function') onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to upload meme');
     } finally {

@@ -5,14 +5,15 @@ let io;
 const activeAuctions = new Map();
 const connectedUsers = new Map();
 
+// --- Competition Logic ---
+const competitionQueue = [];
+const activeCompetitions = new Map(); // roomId -> { user1, user2, meme1, meme2, votes, status, timer }
+
 const initializeSocket = (socketIo) => {
   io = socketIo;
   io.use(async (socket, next) => {
     try {
-
       const token = socket.handshake.auth.token;
-      console.log("toekn comming", token)
-      
 
       if (!token) {
         return next(new Error('Authentication error'));
@@ -24,8 +25,6 @@ const initializeSocket = (socketIo) => {
         .select('*')
         .eq('id', decoded.userId)
         .single();
-
-      console.log("User extracted", user);
 
       if (!user) {
         return next(new Error('User not found'));
@@ -267,25 +266,87 @@ const initializeSocket = (socketIo) => {
       }
     });
 
+    // User joins the competition queue
+    socket.on('join_competition_queue', async () => {
+      if (competitionQueue.find(s => s.userId === socket.userId)) return;
+      competitionQueue.push(socket);
+      if (competitionQueue.length >= 2) {
+        const [user1, user2] = competitionQueue.splice(0, 2);
+        const roomId = `competition_${Date.now()}_${user1.userId}_${user2.userId}`;
+        activeCompetitions.set(roomId, {
+          user1: user1.userId,
+          user2: user2.userId,
+          meme1: null,
+          meme2: null,
+          votes: {},
+          status: 'waiting',
+          timer: null
+        });
+        user1.join(roomId);
+        user2.join(roomId);
+        user1.emit('competition_start', { roomId, opponent: user2.user });
+        user2.emit('competition_start', { roomId, opponent: user1.user });
+        // Create row in competitions table
+        await supabase.from('competitions').insert({
+          id: roomId,
+          user1_id: user1.userId,
+          user2_id: user2.userId,
+          status: 'waiting'
+        });
+      }
+    });
+
+    // User submits meme for competition
+    socket.on('submit_competition_meme', async ({ roomId, memeId }) => {
+      const comp = activeCompetitions.get(roomId);
+      if (!comp) return;
+      let update = {};
+      if (socket.userId === comp.user1) {
+        comp.meme1 = memeId;
+        update.meme1_id = memeId;
+      }
+      if (socket.userId === comp.user2) {
+        comp.meme2 = memeId;
+        update.meme2_id = memeId;
+      }
+      // Update competition row
+      await supabase.from('competitions').update(update).eq('id', roomId);
+      if (comp.meme1 && comp.meme2 && comp.status === 'waiting') {
+        comp.status = 'active';
+        await supabase.from('competitions').update({ status: 'active' }).eq('id', roomId);
+        io.to(roomId).emit('competition_ready', { meme1: comp.meme1, meme2: comp.meme2 });
+        // Start voting timer (e.g., 60 seconds)
+        comp.timer = setTimeout(() => endCompetition(roomId), 60000);
+      }
+    });
+
+    // Spectator joins competition room
+    socket.on('join_competition_room', (roomId) => {
+      socket.join(roomId);
+    });
+
+    // Spectator votes for a meme
+    socket.on('vote_competition_meme', async ({ roomId, memeId }) => {
+      const comp = activeCompetitions.get(roomId);
+      if (!comp || comp.status !== 'active') return;
+      comp.votes[socket.userId] = memeId; // Only one vote per user
+      // Optionally, emit live vote counts
+      const voteCounts = { [comp.meme1]: 0, [comp.meme2]: 0 };
+      Object.values(comp.votes).forEach(mid => {
+        if (voteCounts[mid] !== undefined) voteCounts[mid]++;
+      });
+      io.to(roomId).emit('competition_vote_update', voteCounts);
+    });
+
     socket.on('disconnect', () => {
       console.log(`User ${socket.user.username} disconnected`);
       connectedUsers.delete(socket.userId);
+      // Remove from queue if present
+      const idx = competitionQueue.findIndex(s => s.userId === socket.userId);
+      if (idx !== -1) competitionQueue.splice(idx, 1);
     });
   });
 };
-
-// const emitToAuction = (auctionId, event, data) => {
-//   if (io) {
-//     io.to(`auction_${auctionId}`).emit(event, data);
-//   }
-// };
-
-// const emitToUser = (userId, event, data) => {
-//   const userSocket = connectedUsers.get(userId);
-//   if (userSocket) {
-//     userSocket.emit(event, data);
-//   }
-// };
 
 
 const emitToAuction = (auctionId, event, data) => {
@@ -322,3 +383,29 @@ export {
 };
 
 export const getIo = () => io;
+
+// End competition and announce winner
+async function endCompetition(roomId) {
+  const comp = activeCompetitions.get(roomId);
+  if (!comp || comp.status !== 'active') return;
+  const voteCounts = { [comp.meme1]: 0, [comp.meme2]: 0 };
+  Object.values(comp.votes).forEach(memeId => {
+    if (voteCounts[memeId] !== undefined) voteCounts[memeId]++;
+  });
+  let winnerMeme = comp.meme1;
+  if (voteCounts[comp.meme2] > voteCounts[comp.meme1]) winnerMeme = comp.meme2;
+  let winnerUser = winnerMeme === comp.meme1 ? comp.user1 : comp.user2;
+  comp.status = 'finished';
+  // Update competitions table
+  await supabase.from('competitions').update({
+    status: 'finished',
+    winner_id: winnerUser,
+    ended_at: new Date().toISOString()
+  }).eq('id', roomId);
+  io.to(roomId).emit('competition_result', {
+    winnerUser,
+    winnerMeme,
+    voteCounts
+  });
+  activeCompetitions.delete(roomId);
+}

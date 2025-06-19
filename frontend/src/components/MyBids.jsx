@@ -9,7 +9,6 @@ function MyBids({ user }) {
 
   useEffect(() => {
     fetchBids();
-    // eslint-disable-next-line
   }, []);
 
   const fetchBids = async () => {
