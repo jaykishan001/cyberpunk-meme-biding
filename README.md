@@ -3,6 +3,9 @@
 A full-stack, real-time web application for uploading, voting, and auctioning memes, built with a modern React frontend, Node.js/Express backend, Supabase database, and Socket.IO for live updates.
 
 ---
+## 📸 Demo
+
+https://github.com/user-attachments/assets/591c4d30-baa2-4ceb-8aa1-038f9731a381
 
 ## Table of Contents
 
