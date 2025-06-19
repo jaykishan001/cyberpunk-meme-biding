@@ -20,7 +20,7 @@ function MemeFeed({ socket, memes, setMemes, user }) {
       setMemes(res.data.memes);
       hasFetched.current = true;
     } catch (err) {
-      setError('Failed to fetch memes');
+      setError('Failed to fetch memes', err);
     } finally {
       setLoading(false);
     }
@@ -28,6 +28,7 @@ function MemeFeed({ socket, memes, setMemes, user }) {
 
   // Real-time vote update handler
   const handleVoteUpdate = useCallback((data) => {
+    console.log('Received vote_update:', data);
     setMemes(prev => prev.map(meme =>
       meme.id === data.memeId
         ? { ...meme, upvotes: data.upvotes, downvotes: data.downvotes }

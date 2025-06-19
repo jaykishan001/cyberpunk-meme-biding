@@ -14,6 +14,7 @@ import Signup from './components/Signup';
 import Leaderboard from './components/Leaderboard';
 import Competition from './components/Competition';
 import MyMemes from './components/MyMemes';
+import axios from 'axios';
 
 function App() {
   const navigate = useNavigate();
@@ -22,6 +23,9 @@ function App() {
   const [memes, setMemes] = useState([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [userMemes, setUserMemes] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
+  const [leaderboardError, setLeaderboardError] = useState('');
 
   // Separate socket initialization function - removed socket dependency
   const initializeSocket = useCallback((token) => {
@@ -147,6 +151,35 @@ function App() {
       }
     };
   }, [socket]);
+
+  const fetchLeaderboard = useCallback(async () => {
+    setLeaderboardLoading(true);
+    setLeaderboardError('');
+    try {
+      const res = await axios.get('http://localhost:4000/api/v1/meme/leaderboard');
+      setLeaderboard(res.data.memes);
+    } catch (err) {
+      setLeaderboardError('Failed to fetch leaderboard',err);
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleVoteUpdate = () => fetchLeaderboard();
+    const handleNewMeme = () => fetchLeaderboard();
+    socket.on('vote_update', handleVoteUpdate);
+    socket.on('new_meme', handleNewMeme);
+    return () => {
+      socket.off('vote_update', handleVoteUpdate);
+      socket.off('new_meme', handleNewMeme);
+    };
+  }, [socket, fetchLeaderboard]);
 
   // Memoized ProtectedRoute component - moved outside render
   const ProtectedRoute = useCallback(({ children }) => {
@@ -277,7 +310,7 @@ function App() {
             path="/leaderboard"
             element={
               <ProtectedRoute>
-                <Leaderboard />
+                <Leaderboard leaderboard={leaderboard} loading={leaderboardLoading} error={leaderboardError} fetchLeaderboard={fetchLeaderboard} />
               </ProtectedRoute>
             }
           />

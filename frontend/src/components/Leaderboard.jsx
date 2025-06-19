@@ -1,27 +1,6 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 
-function Leaderboard() {
-  const [memes, setMemes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const res = await axios.get('http://localhost:4000/api/v1/meme/leaderboard');
-        setMemes(res.data.memes);
-      } catch (err) {
-        setError('Failed to fetch leaderboard');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchLeaderboard();
-  }, []);
-
+function Leaderboard({ leaderboard, loading, error, fetchLeaderboard }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -38,13 +17,21 @@ function Leaderboard() {
           {error}
         </div>
       )}
-      {(!memes || memes.length === 0) ? (
+      <div className="flex justify-end mb-4">
+        <button
+          className="cyber-btn px-4 py-2 text-yellow-400 bg-black border-yellow-400 hover:bg-yellow-700 hover:text-white font-mono text-sm"
+          onClick={fetchLeaderboard}
+        >
+          Refresh
+        </button>
+      </div>
+      {(!leaderboard || leaderboard.length === 0) ? (
         <div className="text-center py-8">
           <p className="text-yellow-400 font-mono">No leaderboard data found.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {memes.map((meme, idx) => {
+          {leaderboard.map((meme, idx) => {
             const highlight = idx === 0 ? 'border-yellow-400 shadow-yellow-400/60' : idx === 1 ? 'border-gray-300 shadow-gray-300/60' : idx === 2 ? 'border-orange-400 shadow-orange-400/60' : 'border-cyan-400 shadow-cyan-400/40';
             return (
               <div key={meme.id} className={`cyber-card flex flex-col items-center ${highlight} border-4 shadow-lg`}>
