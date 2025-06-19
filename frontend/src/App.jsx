@@ -10,7 +10,7 @@ import AuctionDetail from './components/AuctionDetail';
 import CreateAuction from './components/CreateAuction';
 import MyAuctions from './components/MyAuctions';
 import MyBids from './components/MyBids';
-import Signup from './components/Signup';
+import Signup from './components/Signup.jsx';
 import Leaderboard from './components/Leaderboard';
 import Competition from './components/Competition';
 import MyMemes from './components/MyMemes';
