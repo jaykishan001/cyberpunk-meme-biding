@@ -142,7 +142,13 @@ function MemeFeed({ socket, memes, setMemes, user }) {
             >
               ×
             </button>
-            <UploadMeme socket={socket} onSuccess={() => setShowUpload(false)} />
+            <UploadMeme
+              socket={socket}
+              onSuccess={() => setShowUpload(false)}
+              onMemeUploaded={(newMeme) => {
+                setMemes(prev => [newMeme, ...prev]);
+              }}
+            />
           </div>
         </div>
       )}

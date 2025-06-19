@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const GEMINI_API_KEY = 'AIzaSyAC53cbMIK9lp9vw7xmq8V2wFyvZ3CDLYw';
 
-function UploadMeme({ socket, onSuccess }) {
+function UploadMeme({ socket, onSuccess, onMemeUploaded }) {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -75,7 +75,7 @@ function UploadMeme({ socket, onSuccess }) {
     formData.append('description', description);
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:4000/api/v1/meme/upload', formData, {
+      const res = await axios.post('http://localhost:4000/api/v1/meme/upload', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -85,6 +85,13 @@ function UploadMeme({ socket, onSuccess }) {
       setTitle('');
       setDescription('');
       setError('');
+      // Fallback: emit a refresh event and/or call onMemeUploaded with the new meme
+      if (socket) {
+        socket.emit('request_refresh_memes');
+      }
+      if (typeof onMemeUploaded === 'function' && res.data?.data?.meme?.[0]) {
+        onMemeUploaded(res.data.data.meme[0]);
+      }
       if (typeof onSuccess === 'function') onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to upload meme');

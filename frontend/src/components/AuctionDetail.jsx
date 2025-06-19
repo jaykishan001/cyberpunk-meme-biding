@@ -15,11 +15,13 @@ function AuctionDetail({ socket, user }) {
   const [timeLeft, setTimeLeft] = useState('');
   const messagesEndRef = useRef(null);
 
+
+  console.log("auction from meme detailed", auction)
   // Calculate auction status
-  const isAuctionEnded = auction?.status === 'ended';
-  const isSeller = user && auction?.seller_id === user.id;
-  const isCurrentOwner = user && auction?.memes?.current_owner_id === user.id;
-  const isHighestBidder = user && auction?.highest_bidder_id === user.id;
+  const isAuctionEnded = auction?.auction?.status === 'ended';
+  const isSeller = user && auction?.auction?.seller_id === user.id;
+  const isCurrentOwner = user && auction?.auction?.memes?.current_owner_id === user.id;
+  const isHighestBidder = user && auction?.auction?.highest_bidder_id === user.id;
   const canBid = !isAuctionEnded && user && !isSeller && !isCurrentOwner;
 
   useEffect(() => {
@@ -36,9 +38,6 @@ function AuctionDetail({ socket, user }) {
       }
     };
   }, [auctionId, socket]);
-
-
-  console.log("auction timeeeing", auction)
 
   useEffect(() => {
     if (auction && !isAuctionEnded) {
@@ -131,13 +130,9 @@ function AuctionDetail({ socket, user }) {
   };
 
   const handleAuctionEnded = (data) => {
-    if (data.auctionId === auctionId) {
-      setAuction(prevAuction => ({
-        ...prevAuction,
-        status: 'ended',
-        winner: data.winner,
-        winningBid: data.winningBid
-      }));
+    if (data.auction && String(data.auction.id) === String(auctionId)) {
+      // Refetch auction details to get the latest winner and state
+      fetchAuctionDetails();
     }
   };
 
@@ -174,7 +169,7 @@ function AuctionDetail({ socket, user }) {
   };
 
   const handleEndAuction = async () => {
-    if (!user || !auction || user.id !== auction.seller_id) return;
+    if (!user || !auction || user.id !== auction?.auction?.seller_id) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -338,7 +333,7 @@ function AuctionDetail({ socket, user }) {
               End Auction
             </button>
           )}
-          <div className="bg-black/80 border border-pink-400 rounded-lg p-4 mt-4 cyber-glow-pink">
+          {/* <div className="bg-black/80 border border-pink-400 rounded-lg p-4 mt-4 cyber-glow-pink">
             <h4 className="text-pink-300 font-bold mb-2 uppercase tracking-widest">Messages</h4>
             <ul className="space-y-1 max-h-32 overflow-y-auto">
               {messages.length === 0 ? (
@@ -369,7 +364,7 @@ function AuctionDetail({ socket, user }) {
                 Send
               </button>
             </form>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

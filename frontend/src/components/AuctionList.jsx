@@ -361,10 +361,10 @@ function AuctionList({ socket, user }) {
               <div className="text-purple-400 text-xs mb-2 font-mono text-center">
                 Seller: {auction.seller?.username || 'Unknown'}
               </div>
-
+                {console.log("auction from auction list", auction)}
               <div className="flex justify-between items-center mb-2">
                 <div className="text-green-400 font-bold font-mono">
-                  ${auction.current_bid || auction.starting_bid || 0}
+                  ${auction.current_highest_bid || auction.starting_price || 0}
                 </div>
                 <div className="text-cyan-300 text-xs font-mono">
                   {auction.bid_count || 0} bids

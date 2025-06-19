@@ -89,7 +89,16 @@ function Competition({ socket, user }) {
       {stage === 'idle' && (
         <div className="text-center">
           <button onClick={joinQueue} className="cyber-btn px-6 py-2 text-green-400 bg-black border-green-400 hover:bg-green-700 hover:text-white font-mono text-lg">Join Competition Queue</button>
+        <div className='text-2xl mt-10'>
+            Right now its not working will Soon make it work!
+            <br/>
+            <div className='text-yellow-400 mt-10'>
+              Thanks for your patience!
+            </div>
         </div>
+        </div>
+
+        
       )}
       {stage === 'waiting' && (
         <div className="text-center text-cyan-400">Waiting for an opponent...</div>
@@ -97,15 +106,21 @@ function Competition({ socket, user }) {
       {stage === 'submit' && (
         <div>
           <div className="mb-4 text-cyan-200">Select a meme to compete with:</div>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {memes.map(meme => (
-              <div key={meme.id} className={`border-2 rounded-lg p-2 cursor-pointer ${selectedMeme === meme.id ? 'border-green-400' : 'border-cyan-700'}`} onClick={() => setSelectedMeme(meme.id)}>
-                <img src={meme.image_url} alt={meme.title} className="w-full h-32 object-cover rounded mb-2" />
-                <div className="text-center text-cyan-400 text-sm">{meme.title}</div>
-              </div>
-            ))}
-          </div>
-          <button onClick={submitMeme} className="cyber-btn px-4 py-2 text-green-400 bg-black border-green-400 hover:bg-green-700 hover:text-white font-mono">Submit Meme</button>
+          {Array.isArray(memes) && memes.length === 0 ? (
+            <div className="text-center text-yellow-400 font-mono mb-4">
+              You have no memes to compete with. Please upload a meme first!
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              {Array.isArray(memes) && memes.map(meme => (
+                <div key={meme.id} className={`border-2 rounded-lg p-2 cursor-pointer ${selectedMeme === meme.id ? 'border-green-400' : 'border-cyan-700'}`} onClick={() => setSelectedMeme(meme.id)}>
+                  <img src={meme.image_url} alt={meme.title} className="w-full h-32 object-cover rounded mb-2" />
+                  <div className="text-center text-cyan-400 text-sm">{meme.title}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          <button onClick={submitMeme} className="cyber-btn px-4 py-2 text-green-400 bg-black border-green-400 hover:bg-green-700 hover:text-white font-mono" disabled={Array.isArray(memes) && memes.length === 0}>Submit Meme</button>
         </div>
       )}
       {stage === 'waiting_for_opponent' && (
@@ -115,7 +130,7 @@ function Competition({ socket, user }) {
         <div>
           <div className="mb-4 text-cyan-200 text-center">Vote for your favorite meme!</div>
           <div className="grid grid-cols-2 gap-4 mb-4">
-            {[myMeme, opponentMeme].map((memeId, idx) => (
+            {Array.isArray(memes) && [myMeme, opponentMeme].map((memeId, idx) => (
               <div key={memeId} className="border-2 rounded-lg p-2 flex flex-col items-center">
                 <img src={memes.find(m => m.id === memeId)?.image_url} alt="Meme" className="w-full h-32 object-cover rounded mb-2" />
                 <button onClick={() => vote(memeId)} className="cyber-btn px-2 py-1 text-yellow-400 bg-black border-yellow-400 hover:bg-yellow-700 hover:text-white font-mono mt-2">Vote</button>
@@ -130,7 +145,7 @@ function Competition({ socket, user }) {
           <div className="text-xl text-green-400 mb-4">Winner: {winner === user.id ? 'You!' : 'Opponent'}</div>
           <div className="mb-2 text-yellow-400">Final Votes:</div>
           <div className="flex justify-center gap-8">
-            {[myMeme, opponentMeme].map((memeId, idx) => (
+            {Array.isArray(memes) && [myMeme, opponentMeme].map((memeId, idx) => (
               <div key={memeId} className="border-2 rounded-lg p-2">
                 <img src={memes.find(m => m.id === memeId)?.image_url} alt="Meme" className="w-24 h-24 object-cover rounded mb-2" />
                 <div className="text-yellow-400">Votes: {voteCounts[memeId] || 0}</div>
