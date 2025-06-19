@@ -4,6 +4,7 @@ import UploadMeme from './UploadMeme';
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
 
 function MemeFeed({ socket, memes, setMemes, user }) {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [voting, setVoting] = useState(new Set());
@@ -16,7 +17,7 @@ function MemeFeed({ socket, memes, setMemes, user }) {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('http://localhost:4000/api/v1/meme/all');
+      const res = await axios.get(`${BASE_URL}/api/v1/meme/all`);
       setMemes(res.data.memes);
       hasFetched.current = true;
     } catch (err) {

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function CreateAuction({ user, userMemes, setUserMemes, onAuctionCreated }) {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const navigate = useNavigate();
   const [selectedMeme, setSelectedMeme] = useState("");
   const [startingBid, setStartingBid] = useState("");
@@ -22,7 +23,7 @@ function CreateAuction({ user, userMemes, setUserMemes, onAuctionCreated }) {
       }
 
       const res = await axios.get(
-        "http://localhost:4000/api/v1/meme/user-memes",
+        `${BASE_URL}/api/v1/meme/user-memes`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -85,7 +86,7 @@ function CreateAuction({ user, userMemes, setUserMemes, onAuctionCreated }) {
       console.log("duration", duration);
 
       const response = await axios.post(
-        "http://localhost:4000/api/v1/auction/create",
+        `${BASE_URL}/api/v1/auction/create`,
         {
           memeId: selectedMeme,
           startingBid: parseFloat(startingBid),

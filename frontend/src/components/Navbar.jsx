@@ -33,7 +33,7 @@ function Navbar({ user, onLogout }) {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <Link to="/" className="cyber-heading text-cyan-400">
-              MEMEBIDING
+            MemeHustle
             </Link>
             {user && (
               <div className="hidden md:flex space-x-4">

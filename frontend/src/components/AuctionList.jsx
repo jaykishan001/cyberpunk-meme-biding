@@ -92,6 +92,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 function AuctionList({ socket, user }) {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -109,7 +110,7 @@ function AuctionList({ socket, user }) {
         headers: { 'Authorization': `Bearer ${token}` }
       } : {};
 
-      const res = await axios.get('http://localhost:4000/api/v1/auction/active', config);
+      const res = await axios.get(`${BASE_URL}/api/v1/auction/active`, config);
       console.log("auctions", res.data.data.auctions);
       setAuctions(res.data.data.auctions || []);
     } catch (err) {
@@ -330,9 +331,10 @@ function AuctionList({ socket, user }) {
           <div key={auction.id} className="cyber-card flex flex-col">
             {/* Image */}
             <div className="relative">
+
               <img
-                src={auction.meme?.image_url}
-                alt={auction.meme?.title || 'Auction item'}
+                src={auction.memes?.image_url}
+                alt={auction.memes?.title || 'Auction item'}
                 className="w-full h-56 object-cover rounded-lg mb-4 border-2 border-cyan-400 shadow-cyan-400/40 shadow-lg"
                 loading="lazy"
                 onError={(e) => {
@@ -355,13 +357,12 @@ function AuctionList({ socket, user }) {
             {/* Content */}
             <div className="flex-1 flex flex-col">
               <h3 className="text-lg font-bold mb-2 text-cyan-400 cyber-glow-cyan uppercase tracking-widest text-center">
-                {auction.meme?.title || 'Untitled'}
+                {auction.memes?.title || 'Untitled'}
               </h3>
               
               <div className="text-purple-400 text-xs mb-2 font-mono text-center">
                 Seller: {auction.seller?.username || 'Unknown'}
               </div>
-                {console.log("auction from auction list", auction)}
               <div className="flex justify-between items-center mb-2">
                 <div className="text-green-400 font-bold font-mono">
                   ${auction.current_highest_bid || auction.starting_price || 0}

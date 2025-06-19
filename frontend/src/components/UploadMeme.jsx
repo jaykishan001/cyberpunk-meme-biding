@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const GEMINI_API_KEY = 'AIzaSyAC53cbMIK9lp9vw7xmq8V2wFyvZ3CDLYw';
-
 function UploadMeme({ socket, onSuccess, onMemeUploaded }) {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+  const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -32,7 +32,7 @@ function UploadMeme({ socket, onSuccess, onMemeUploaded }) {
     setError('');
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -75,7 +75,7 @@ function UploadMeme({ socket, onSuccess, onMemeUploaded }) {
     formData.append('description', description);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:4000/api/v1/meme/upload', formData, {
+      const res = await axios.post(`${BASE_URL}/api/v1/meme/upload`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

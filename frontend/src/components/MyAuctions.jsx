@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function MyAuctions({ user }) {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -18,7 +19,7 @@ function MyAuctions({ user }) {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:4000/api/v1/auction/user/auctions?status=${status}`,
+      const res = await axios.get(`${BASE_URL}/api/v1/auction/user/auctions?status=${status}`,
         { headers: { 'Authorization': `Bearer ${token}` } });
 
       console.log("res of auctions", res);
@@ -33,7 +34,7 @@ function MyAuctions({ user }) {
   const handleEndAuction = async (auctionId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.patch(`http://localhost:4000/api/v1/auction/${auctionId}/end`, {}, {
+      await axios.patch(`${BASE_URL}/api/v1/auction/${auctionId}/end`, {}, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       fetchAuctions();

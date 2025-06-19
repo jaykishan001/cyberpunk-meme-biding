@@ -27,9 +27,14 @@ function App() {
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [leaderboardError, setLeaderboardError] = useState('');
 
+
+
+
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+  console.log('BASE_URL', BASE_URL);
   // Separate socket initialization function - removed socket dependency
   const initializeSocket = useCallback((token) => {
-    const newSocket = io('http://localhost:4000', {
+    const newSocket = io(`${BASE_URL}`, {
       auth: { token },
       forceNew: true
     });
@@ -156,7 +161,7 @@ function App() {
     setLeaderboardLoading(true);
     setLeaderboardError('');
     try {
-      const res = await axios.get('http://localhost:4000/api/v1/meme/leaderboard');
+      const res = await axios.get(`${BASE_URL}/api/v1/meme/leaderboard`);
       setLeaderboard(res.data.memes);
     } catch (err) {
       setLeaderboardError('Failed to fetch leaderboard',err);

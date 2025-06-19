@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 
 function Competition({ socket, user }) {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const [stage, setStage] = useState('idle'); // idle, waiting, submit, voting, result
   const [roomId, setRoomId] = useState(null);
   const [opponent, setOpponent] = useState(null);
@@ -57,7 +58,7 @@ function Competition({ socket, user }) {
   const fetchUserMemes = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:4000/api/v1/meme/user-memes', {
+      const res = await axios.get(`${BASE_URL}/api/v1/meme/user-memes`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMemes(res.data.memes);

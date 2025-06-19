@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 function MyMemes({ user }) {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const [memes, setMemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -12,7 +13,7 @@ function MyMemes({ user }) {
       setError('');
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:4000/api/v1/meme/user-memes', {
+        const res = await axios.get(`${BASE_URL}/api/v1/meme/user-memes`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

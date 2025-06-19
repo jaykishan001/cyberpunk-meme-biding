@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function AuctionDetail({ socket, user }) {
+
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const { auctionId } = useParams();
   const navigate = useNavigate();
   const [auction, setAuction] = useState(null);
@@ -92,12 +94,12 @@ function AuctionDetail({ socket, user }) {
     try {
       const token = localStorage.getItem('token');
       const [auctionResponse, bidHistoryResponse] = await Promise.all([
-        axios.get(`http://localhost:4000/api/v1/auction/${auctionId}`, {
+        axios.get(`${BASE_URL}/api/v1/auction/${auctionId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         }),
-        axios.get(`http://localhost:4000/api/v1/auction/${auctionId}/bids`, {
+        axios.get(`${BASE_URL}/api/v1/auction/${auctionId}/bids`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -154,7 +156,7 @@ function AuctionDetail({ socket, user }) {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `http://localhost:4000/api/v1/auction/${auctionId}/bid`,
+        `${BASE_URL}/api/v1/auction/${auctionId}/bid`,
         { bidAmount: parseFloat(bidAmount) },
         {
           headers: {
@@ -174,7 +176,7 @@ function AuctionDetail({ socket, user }) {
     try {
       const token = localStorage.getItem('token');
       await axios.patch(
-        `http://localhost:4000/api/v1/auction/${auctionId}/end`,
+        `${BASE_URL}/api/v1/auction/${auctionId}/end`,
         {},
         {
           headers: {

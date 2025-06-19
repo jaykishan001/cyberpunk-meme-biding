@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Signup() {
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -23,7 +24,7 @@ function Signup() {
     e.preventDefault();
     setError('');
     try {
-      await axios.post('http://localhost:4000/api/v1/user/register', formData);
+      await axios.post(`${BASE_URL}/api/v1/user/register`, formData);
       // Redirect to login page after successful signup
       navigate('/login');
     } catch (err) {
