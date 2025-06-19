@@ -211,10 +211,3 @@ CLIENT_URL=http://localhost:5173
 
 ---
 
-## License
-
-This project is licensed under the ISC License.
-
----
-
-**Feel free to customize this README further for deployment, contributing, or advanced configuration details!**
