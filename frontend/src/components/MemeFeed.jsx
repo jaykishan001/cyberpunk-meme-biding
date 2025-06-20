@@ -39,9 +39,11 @@ function MemeFeed({ socket, memes, setMemes, user }) {
 
   // Vote success handler (for the voting user)
   const handleVoteSuccess = useCallback((data) => {
+    console.log('Vote success received:', data);
     setVoting(prev => {
       const newSet = new Set(prev);
-      newSet.delete(parseInt(data.memeId));
+      const memeId = typeof data.memeId === 'string' ? parseInt(data.memeId) : data.memeId;
+      newSet.delete(memeId);
       return newSet;
     });
   }, []);
@@ -54,9 +56,12 @@ function MemeFeed({ socket, memes, setMemes, user }) {
 
   // Already registered vote handler
   const handleVoteAlreadyRegistered = useCallback((data) => {
+    console.log('Vote already registered received:', data);
     setVoting(prev => {
       const newSet = new Set(prev);
-      newSet.delete(parseInt(data.memeId));
+      // Ensure memeId is a number for consistent comparison
+      const memeId = typeof data.memeId === 'string' ? parseInt(data.memeId) : data.memeId;
+      newSet.delete(memeId);
       return newSet;
     });
   }, []);
@@ -102,10 +107,26 @@ function MemeFeed({ socket, memes, setMemes, user }) {
 
   // Voting handler
   const handleVote = useCallback((memeId, voteType) => {
-    if (!socket || !user || voting.has(memeId)) return;
-    setVoting(prev => new Set([...prev, memeId]));
+    if (!socket || !user) return;
+    console.log('Voting for meme:', memeId, 'type:', voteType, 'current voting state:', Array.from(voting));
+    setVoting(prev => {
+      const newSet = new Set(prev);
+      newSet.add(memeId);
+      console.log('Updated voting state:', Array.from(newSet));
+      return newSet;
+    });
     setError('');
     socket.emit('vote_meme', { memeId, voteType });
+    
+    // Fallback: Clear voting state after 5 seconds if no response
+    setTimeout(() => {
+      setVoting(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(memeId);
+        console.log('Fallback: Cleared voting state for meme:', memeId);
+        return newSet;
+      });
+    }, 1000);
   }, [socket, user, voting]);
 
   // UI
