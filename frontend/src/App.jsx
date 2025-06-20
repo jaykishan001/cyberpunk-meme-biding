@@ -216,7 +216,7 @@ function App() {
     <div
       className="min-h-screen relative"
       style={{
-        background: "url('/bgimage.jpg') no-repeat center center fixed, #0f172a",
+        background: "url('/bgimage.webp') no-repeat center center fixed, #0f172a",
         backgroundSize: "cover",
         minHeight: "100vh"
       }}
